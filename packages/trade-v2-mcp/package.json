@@ -1,0 +1,13 @@
+{
+  "name": "@prismswap/trade-v2-mcp",
+  "version": "0.1.0-prerelease.0",
+  "description": "Private, unpublished agent-safe MCP adapter over PrismSwap /v1 and TradeSession preparation surfaces.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20.18.0" },
+  "bin": { "prismswap-trade-v2-mcp": "./src/stdio.mjs" },
+  "scripts": { "test": "node --test test/*.test.mjs" },
+  "dependencies": { "@prismswap/escrow-sdk": "0.1.0-prerelease.0" },
+  "repository": { "type": "git", "url": "https://github.com/Genera77/prismswap-sdk.git" }
+}

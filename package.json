@@ -1,0 +1,22 @@
+{
+  "name": "prismswap-sdk-monorepo",
+  "version": "0.1.0-prerelease.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": { "node": ">=20.18.0" },
+  "workspaces": ["packages/escrow-sdk", "packages/trade-v2-mcp", "examples/external-integration", "examples/webhook-receiver"],
+  "scripts": {
+    "build": "npm run build -w @prismswap/escrow-sdk",
+    "type-check": "npm run type-check -w @prismswap/escrow-sdk && npm run type-check -w @prismswap/example-external-integration && npm run type-check -w @prismswap/example-webhook-receiver",
+    "test": "npm run test -w @prismswap/escrow-sdk && npm run test -w @prismswap/trade-v2-mcp",
+    "examples:check": "npm run type-check -w @prismswap/example-external-integration && npm run type-check -w @prismswap/example-webhook-receiver",
+    "check:openapi": "node scripts/check-openapi.mjs",
+    "audit:private-imports": "node scripts/private-import-audit.mjs",
+    "audit:secrets": "node scripts/secret-pattern-scan.mjs",
+    "verify:packages": "node scripts/verify-packages.mjs",
+    "verify": "npm run build && npm run type-check && npm run test && npm run examples:check && npm run check:openapi && npm run audit:private-imports && npm run audit:secrets && npm run verify:packages"
+  },
+  "devDependencies": { "typescript": "5.9.3" },
+  "overrides": { "rpc-websockets": { "uuid": "9.0.1" } }
+}

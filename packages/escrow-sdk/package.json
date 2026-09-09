@@ -1,0 +1,26 @@
+{
+  "name": "@prismswap/escrow-sdk",
+  "version": "0.1.0-prerelease.0",
+  "description": "Typed /v1 client, TradeSession basket safety helpers, Oracle polling, and signed webhook verification for PrismSwap.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "sideEffects": false,
+  "engines": { "node": ">=20.18.0" },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4"
+  },
+  "devDependencies": { "typescript": "5.9.3" },
+  "repository": { "type": "git", "url": "https://github.com/Genera77/prismswap-sdk.git" },
+  "bugs": { "url": "https://github.com/Genera77/prismswap-sdk/issues" },
+  "homepage": "https://github.com/Genera77/prismswap-sdk#readme"
+}

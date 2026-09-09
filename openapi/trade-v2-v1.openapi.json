@@ -1,0 +1,1210 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PrismSwap Trade Authority V2 Public API",
+    "version": "2026-08-04",
+    "description": "Versioned integration API. Oracle-backed projection is authoritative; candidate submission and RPC confirmation never advance state. Webhooks only deliver authoritative state."
+  },
+  "servers": [
+    {
+      "url": "/v1"
+    }
+  ],
+  "security": [
+    {
+      "integrationBearer": []
+    }
+  ],
+  "paths": {
+    "/capabilities": {
+      "get": {
+        "operationId": "getCapabilities",
+        "security": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "getOpenApi",
+        "security": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades": {
+      "get": {
+        "operationId": "listTrades",
+        "x-prismswap-scope": "read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "externalReference",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createTrade",
+        "x-prismswap-scope": "trade:create",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "taker",
+                  "assets"
+                ],
+                "properties": {
+                  "taker": {
+                    "type": "string"
+                  },
+                  "assets": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "externalReference": {
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}": {
+      "get": {
+        "operationId": "getTrade",
+        "x-prismswap-scope": "read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sanitized authoritative trade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTrade"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/history": {
+      "get": {
+        "operationId": "getTradeHistory",
+        "x-prismswap-scope": "read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/construction-context": {
+      "get": {
+        "operationId": "getConstructionContext",
+        "x-prismswap-scope": "transaction:prepare",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/proposals": {
+      "post": {
+        "operationId": "createProposal",
+        "x-prismswap-scope": "negotiation",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/proposals/{proposalId}/seen": {
+      "post": {
+        "operationId": "markProposalSeen",
+        "x-prismswap-scope": "negotiation",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/ProposalId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/proposals/{proposalId}/approve": {
+      "post": {
+        "operationId": "approveProposal",
+        "x-prismswap-scope": "negotiation",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/ProposalId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/escrow-intents": {
+      "post": {
+        "operationId": "createEscrowIntent",
+        "x-prismswap-scope": "transaction:prepare",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/escrow-intents/{intentId}/candidates": {
+      "post": {
+        "operationId": "submitInitializationCandidate",
+        "x-prismswap-scope": "candidate:submit",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "intentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/trades/{tradeId}/candidates": {
+      "post": {
+        "operationId": "submitTransitionCandidate",
+        "x-prismswap-scope": "candidate:submit",
+        "description": "Submits a candidate only. Oracle verification is required before authoritative state changes. Safe cancellation, recovery and withdrawal remain available when forward actions are paused.",
+        "security": [
+          {
+            "integrationBearer": [],
+            "participantWallet": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TradeId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints": {
+      "get": {
+        "operationId": "listWebhookEndpoints",
+        "x-prismswap-scope": "webhook:manage",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createWebhookEndpoint",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/verify": {
+      "post": {
+        "operationId": "verifyWebhookEndpoint",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/pause": {
+      "post": {
+        "operationId": "pauseWebhookEndpoint",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/reactivate": {
+      "post": {
+        "operationId": "reactivateWebhookEndpoint",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/retire": {
+      "post": {
+        "operationId": "retireWebhookEndpoint",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/rotate-secret": {
+      "post": {
+        "operationId": "rotateWebhookSecret",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/deliveries": {
+      "get": {
+        "operationId": "listWebhookDeliveries",
+        "x-prismswap-scope": "webhook:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    },
+    "/webhook-endpoints/{endpointId}/replays": {
+      "post": {
+        "operationId": "requestWebhookReplay",
+        "x-prismswap-scope": "webhook:manage",
+        "description": "Requests a bounded seven-day replay. Logical event IDs remain stable; each replay receives a new delivery ID.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EndpointId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JsonBody"
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/JsonSuccess"
+          },
+          "default": {
+            "$ref": "#/components/responses/PublicError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "integrationBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "pv1",
+        "description": "Scoped external integration credential. Never grants wallet, participant, Oracle, rollout, cohort, canary, emergency, or operator authority."
+      },
+      "participantWallet": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Wallet-Signature",
+        "description": "Exact participant wallet authorization, accompanied by X-Wallet-Address and X-Wallet-Message."
+      }
+    },
+    "parameters": {
+      "TradeId": {
+        "name": "tradeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ProposalId": {
+        "name": "proposalId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "EndpointId": {
+        "name": "endpointId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128
+        },
+        "description": "Integration-bound mutation key. Reuse with a different payload fails closed."
+      },
+      "Cursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 25
+        }
+      }
+    },
+    "requestBodies": {
+      "JsonBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "JsonSuccess": {
+        "description": "Successful response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "PublicError": {
+        "description": "Stable safe error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PublicError"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "PublicError": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message",
+              "diagnosticId",
+              "retryable",
+              "status"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "diagnosticId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "integer"
+              },
+              "validation": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "field",
+                    "message"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PublicTrade": {
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "tradeId",
+          "participants",
+          "authoritativeStatus",
+          "authorizedActions",
+          "oracle",
+          "supportedRails",
+          "orderedTerms",
+          "executionStrategy",
+          "perLegProgress",
+          "progress",
+          "basketLifecycle",
+          "diagnosticId"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "v1"
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "proposalId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "participants": {
+            "type": "object",
+            "properties": {
+              "maker": {
+                "type": "string"
+              },
+              "taker": {
+                "type": "string"
+              }
+            }
+          },
+          "authoritativeStatus": {
+            "type": "string"
+          },
+          "priorStatus": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authorizedActions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pendingCandidate": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "oracle": {
+            "type": "object"
+          },
+          "conflict": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "supportedRails": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "sol",
+                "spl",
+                "token2022",
+                "core",
+                "pnft",
+                "compressed_nft"
+              ]
+            }
+          },
+          "orderedTerms": {
+            "$ref": "#/components/schemas/BasketTerms"
+          },
+          "executionStrategy": {
+            "enum": [
+              "trade_v2_atomic",
+              "trade_session"
+            ]
+          },
+          "perLegProgress": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BasketLegProgress"
+            }
+          },
+          "progress": {
+            "type": "object",
+            "required": [
+              "funded",
+              "required",
+              "released",
+              "withdrawn"
+            ],
+            "properties": {
+              "funded": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "required": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 18
+              },
+              "released": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "withdrawn": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "basketLifecycle": {
+            "enum": [
+              "building",
+              "maker_funding",
+              "awaiting_taker",
+              "taker_funding",
+              "committed",
+              "releasing",
+              "cancelling",
+              "recovery",
+              "settled",
+              "cancelled"
+            ]
+          },
+          "externalReference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "diagnosticId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "BasketTerms": {
+        "type": "object",
+        "required": [
+          "maker",
+          "taker",
+          "makerSolLamports",
+          "takerSolLamports",
+          "expiresAt"
+        ],
+        "properties": {
+          "maker": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/BasketLeg"
+            }
+          },
+          "taker": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/BasketLeg"
+            }
+          },
+          "makerSolLamports": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$"
+          },
+          "takerSolLamports": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BasketLeg": {
+        "type": "object",
+        "required": [
+          "side",
+          "index",
+          "kind",
+          "amount"
+        ],
+        "properties": {
+          "side": {
+            "enum": [
+              "maker",
+              "taker"
+            ]
+          },
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "kind": {
+            "enum": [
+              "spl",
+              "token2022",
+              "core",
+              "pnft",
+              "compressed_nft"
+            ]
+          },
+          "mint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assetId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tree": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "leafIndex": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "railEvidence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Oracle-verified exact Core collection, pNFT token-record/rule-set, or cNFT DAS/proof evidence."
+          }
+        }
+      },
+      "BasketLegProgress": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasketLeg"
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "beneficiary"
+            ],
+            "properties": {
+              "state": {
+                "enum": [
+                  "required",
+                  "deposited",
+                  "released",
+                  "withdrawn"
+                ]
+              },
+              "beneficiary": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "WebhookEvent": {
+        "type": "object",
+        "description": "Signed delivery of authoritative state; never a state-creation command.",
+        "required": [
+          "schemaVersion",
+          "eventId",
+          "type",
+          "occurredAt",
+          "tradeId",
+          "authoritativeStatus",
+          "oracle",
+          "diagnosticId",
+          "currentStateUrl"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "trade.created",
+              "proposal.approved",
+              "trade.initialization_verified",
+              "trade.acceptance_verified",
+              "trade.maker_funding_verified",
+              "trade.taker_funding_verified",
+              "trade.leg_funding_verified",
+              "trade.ready_for_settlement",
+              "trade.basket_committed",
+              "trade.settlement_submitted",
+              "trade.leg_release_verified",
+              "trade.settlement_verified",
+              "trade.cancellation_initiated",
+              "trade.recovery_initiated",
+              "trade.basket_recovery_started",
+              "trade.withdrawal_verified",
+              "trade.terminal_completion_verified",
+              "trade.basket_terminal_verified",
+              "trade.conflict_detected",
+              "trade.oracle_verification_delayed"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "externalReference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authoritativeStatus": {
+            "type": "string"
+          },
+          "priorStatus": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "oracle": {
+            "type": "object"
+          },
+          "pending": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "conflict": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "perLegProgress": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BasketLegProgress"
+            }
+          },
+          "diagnosticId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currentStateUrl": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "tradeLifecycle": {
+      "post": {
+        "description": "HMAC-SHA256 v1 over version.eventId.deliveryId.timestamp.endpointId.integrationId.payloadSha256. Receivers reject duplicate event/delivery IDs and timestamps outside 300 seconds. Retries retain event ID and use a new delivery ID.",
+        "parameters": [
+          {
+            "name": "X-PrismSwap-Event-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-PrismSwap-Delivery-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-PrismSwap-Timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "X-PrismSwap-Signature-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "v1"
+            }
+          },
+          {
+            "name": "X-PrismSwap-Signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted"
+          }
+        }
+      }
+    }
+  }
+}

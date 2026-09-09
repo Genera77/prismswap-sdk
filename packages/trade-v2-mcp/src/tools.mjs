@@ -1,0 +1,16 @@
+export const ESCROW_MCP_TOOLS = Object.freeze([
+  ['escrow_get_capabilities', 'Discover public API, SDK, rail and safety capabilities', []],
+  ['escrow_create_trade', 'Create a trade intention with participant authorization', ['participant', 'trade', 'idempotencyKey']],
+  ['escrow_get_trade', 'Fetch current authoritative trade state', ['tradeId']],
+  ['escrow_get_authorized_actions', 'Return only actions authorized by current Oracle-backed state', ['tradeId']],
+  ['escrow_prepare_initialization', 'Prepare unsigned initialization plan for explicit wallet approval', ['participant', 'tradeId']],
+  ['escrow_prepare_acceptance', 'Prepare unsigned taker acceptance plan for explicit wallet approval', ['participant', 'tradeId']],
+  ['escrow_prepare_funding', 'Prepare unsigned participant funding plan for explicit wallet approval', ['participant', 'tradeId']],
+  ['escrow_prepare_settlement', 'Prepare unsigned atomic entitlement commitment plan for explicit wallet approval', ['participant', 'tradeId']],
+  ['escrow_prepare_claim_remaining', 'Prepare durable delivery of the participant pending settled entitlements', ['participant', 'tradeId']],
+  ['escrow_submit_signature', 'Submit an already-known signature as an Oracle-verification candidate', ['participant', 'tradeId', 'candidate', 'idempotencyKey']],
+  ['escrow_wait_for_verification', 'Poll authoritative state until Oracle verification advances', ['tradeId']],
+  ['escrow_prepare_cancellation', 'Prepare an authorized unsigned cancellation plan', ['participant', 'tradeId']],
+  ['escrow_prepare_recovery', 'Prepare an authorized unsigned expiration recovery plan', ['participant', 'tradeId']],
+  ['escrow_get_conflict', 'Fetch safe public conflict diagnostics', ['tradeId']],
+].map(([name, description, required]) => ({ name, description, inputSchema: { type: 'object', additionalProperties: false, properties: { sessionId: { type: 'string' }, tradeId: { type: 'string' }, participant: { type: 'object', required: ['walletAddress','walletMessage','walletSignature'], properties: { walletAddress: { type: 'string' }, walletMessage: { type: 'string' }, walletSignature: { type: 'string' } }, additionalProperties: false }, trade: { type: 'object' }, candidate: { type: 'object' }, idempotencyKey: { type: 'string', minLength: 16, maxLength: 128 }, previousSequence: { type: ['string','null'] }, timeoutMs: { type: 'integer', minimum: 1, maximum: 120000 } }, required } })))
