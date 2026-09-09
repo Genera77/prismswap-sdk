@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node 20.18.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.0'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Build, type-check, test, examples, OpenAPI and audits
+        run: npm run verify
+
+      - name: Inspect SDK package contents without publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm pack --dry-run --json -w @prismswap/escrow-sdk > /tmp/escrow-sdk-pack.json
+          cat /tmp/escrow-sdk-pack.json
+
+      - name: Inspect MCP package contents without publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm pack --dry-run --json -w @prismswap/trade-v2-mcp > /tmp/trade-v2-mcp-pack.json
+          cat /tmp/trade-v2-mcp-pack.json
