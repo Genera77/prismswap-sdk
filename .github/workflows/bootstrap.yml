@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'bootstrap/sdk.part*'
+      - 'bootstrap/standalone-fix.patch'
       - '.github/workflows/bootstrap.yml'
   workflow_dispatch:
 
