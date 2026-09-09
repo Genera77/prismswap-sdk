@@ -1,3 +1,13 @@
+--- a/package.json
++++ b/package.json
+@@ -17,5 +17,6 @@
+     "verify:packages": "node scripts/verify-packages.mjs",
+     "verify": "npm run build && npm run type-check && npm run test && npm run examples:check && npm run check:openapi && npm run audit:private-imports && npm run audit:secrets && npm run verify:packages"
+   },
+-  "devDependencies": { "typescript": "5.9.3" }
++  "devDependencies": { "typescript": "5.9.3" },
++  "overrides": { "rpc-websockets": { "uuid": "9.0.1" } }
+ }
 --- a/packages/escrow-sdk/src/entitlement.ts
 +++ b/packages/escrow-sdk/src/entitlement.ts
 @@ -9,7 +9,7 @@
