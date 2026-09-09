@@ -17,8 +17,6 @@ PrismSwap provides authoritative trade state through its API and Oracle-backed s
 - `@prismswap/escrow-ui` — extraction **deferred** because the private source controller still imports a large legacy atomic ABI/builder surface that is outside this safe extraction pass.
 - Escrow UI reference app — deferred with the UI package; no hosted widget exists in this repository.
 
-The Solana program, production application, server implementation, Oracle implementation, database/migrations, worker, deployment/canary/operator controls, and production configuration are not included.
-
 ## Supported asset surface
 
 Current public capability metadata represents SOL plus up to **8 non-SOL assets per side** using Metaplex Core, pNFT, compressed NFT/cNFT, classic SPL unit-principal collectible compatibility, and supported extension-free Token-2022 unit-principal compatibility. SPL/Token-2022 session legs are collectible compatibility surfaces, not arbitrary fungible-token basket trading.
