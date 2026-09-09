@@ -25,6 +25,7 @@ jobs:
           cat bootstrap/sdk.part* | base64 -d > /tmp/prismswap-sdk.tar.gz
           echo '5829bbb56e7c48d5887d39a4123c3fcdb2b3d511f4630501d7c16cdbe688a5df  /tmp/prismswap-sdk.tar.gz' | sha256sum -c -
           tar -xzf /tmp/prismswap-sdk.tar.gz
+          patch -p1 < bootstrap/standalone-fix.patch
 
       - name: Use Node 20.18.0
         uses: actions/setup-node@v4
